@@ -1,0 +1,18 @@
+/* light */
+:root {
+  /* color */
+  --color-primary: #1b5a96;
+}
+
+/* dark */
+:root[data-theme='dark'] {
+  /* color */
+  --color-primary: #0d9806;
+}
+
+@theme {
+  --color-primary: var(--color-primary);
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+  --breakpoint-3xl: 120rem;
+}

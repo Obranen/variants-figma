@@ -18,12 +18,13 @@ const Home = () => {
     <>
       <button
         onClick={toggleTheme}
-        className="mb-4 px-4 py-2 bg-[var(--primary)] text-white rounded"
+        className="mb-4 px-4 py-2 bg-primary text-white rounded"
       >
         Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
       </button>
       {/* <RegistrationForm /> */}
-      <h1 className="text-primary">Hello world!</h1>
+      <h1 className="3xl:bg-primary">Hello world!</h1>
+      {/* <div className="bg-primary">with css</div> */}
     </>
   )
 }
