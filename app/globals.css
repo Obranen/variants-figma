@@ -1,2 +1,2 @@
 @import 'tailwindcss';
-@import '../../tokens/build/tailwind-variables.css';
+@import '../variables/build/tailwind-variables.css';
