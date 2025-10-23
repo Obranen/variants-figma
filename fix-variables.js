@@ -128,14 +128,23 @@ const breakpointVars = [];
 
 // Добавляем переменные из light секции как var()
 Object.keys(variables.light).forEach(name => {
-  themeVars.push(`  ${name}: var(${name});`);
+  let key = name;
+  if (name.startsWith('--color-')) {
+    const prefix = name.split('-')[2];
+    const suffix = name.split('-').slice(2).join('-');
+    key = `--${prefix}-${suffix}`;
+  }
+  themeVars.push(`  ${key}: var(${name});`);
 });
 
 // Добавляем breakpoint переменные
 Object.keys(variables.globals).forEach(name => {
   if (name.startsWith('--breakpoint')) {
+    const prefix = name.split('-')[2];
+    const suffix = name.split('-').slice(2).join('-');
+    const key = `--${prefix}-${suffix}`;
     // @ts-ignore
-    breakpointVars.push(`  ${name}: ${variables.globals[name]};`);
+    breakpointVars.push(`  ${key}: ${variables.globals[name]};`);
   }
 });
 
