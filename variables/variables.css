@@ -1,23 +1,22 @@
-/* globals */
-:root {
-  /* Mode 1 */
-  /* color */
-  --color-blue-500: #1b5a96;
-  --color-green-500: #0d9806;
-  /* number */
-  --breakpoint-xl: 80rem;
-  --breakpoint-2xl: 96rem;
-  --breakpoint-3xl: 120rem;
-}
 /* light */
 :root {
   /* Mode 1 */
   /* color */
   --color-primary: #1b5a96;
+  --text-primary: 1rem;
 }
 /* dark */
 :root {
   /* Mode 1 */
   /* color */
   --color-primary: #0d9806;
+  --text-primary: 1.25rem;
+}
+/* breakpoint */
+:root {
+  /* Mode 1 */
+  /* number */
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+  --breakpoint-3xl: 120rem;
 }

@@ -23,8 +23,8 @@ const Home = () => {
         Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
       </button>
       {/* <RegistrationForm /> */}
-      {/* <h1 className="xl:bg-primary">Hello world!</h1> */}
-      <div className="bg-color-primary">with css fefe</div>
+      <h1 className="xl:bg-primary">Hello world!</h1>
+      <div className="bg-primary">with css fefe</div>
     </>
   )
 }

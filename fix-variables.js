@@ -36,20 +36,19 @@ content = content.replace(
 );
 console.log('✅ Обновлен селектор для темной темы');
 
+// Массив префиксов, которые добавляются в @theme без var()
+const ignorePrefixes = ['breakpoint'];
+
 // Сохраняем оригинальные секции :root для вывода
 const originalSections = content.match(/\/\*\s*(light|dark)\s*\*\/\s*:root(\[data-theme='dark'\])?\s*{[\s\S]*?}\s*/g) || [];
 
 // Шаг 5: Парсим переменные из разных секций
-const variables = {
-  light: {},
-  dark: {},
-  globals: {}
-};
+const themeVariables = {};
 
 // @ts-ignore - отключаем проверки TypeScript для динамических объектов
 
 // Разбиваем контент на секции
-const sections = content.split(/\/\*\s*(globals|light|dark)\s*\*\/\s*:root(\[data-theme='dark'\])?\s*{([\s\S]*?)}\s*/);
+const sections = content.split(/\/\*\s*(\w+)\s*\*\/\s*:root(\[data-theme='dark'\])?\s*{([\s\S]*?)}\s*/);
 
 for (let i = 1; i < sections.length; i += 4) {
   const sectionType = sections[i];
@@ -63,45 +62,14 @@ for (let i = 1; i < sections.length; i += 4) {
     varMatches.forEach(varMatch => {
       const [, name, value] = varMatch.match(/(--[\w-]+):\s*(.+)/) || [];
       if (name && value) {
-        if (sectionType === 'globals') {
-          // @ts-ignore
-          variables.globals[name] = value.trim();
-        } else if (sectionType === 'light') {
-          // @ts-ignore
-          variables.light[name] = value.trim();
-        } else if (sectionType === 'dark') {
-          // @ts-ignore
-          variables.dark[name] = value.trim();
-        }
+        // @ts-ignore
+        themeVariables[name] = value.trim();
       }
     });
   }
 }
 
 console.log('✅ Извлечены переменные из всех секций');
-
-// Шаг 6: Собираем переменные для @theme блока
-const themeVariables = {};
-
-// Добавляем breakpoint переменные из globals
-Object.keys(variables.globals).forEach(name => {
-  if (name.startsWith('--breakpoint')) {
-    // @ts-ignore
-    themeVariables[name] = variables.globals[name];
-  }
-});
-
-// Добавляем переменные из light секции
-Object.keys(variables.light).forEach(name => {
-  // @ts-ignore
-  themeVariables[name] = variables.light[name];
-});
-
-// Добавляем переменные из dark секции
-Object.keys(variables.dark).forEach(name => {
-  // @ts-ignore
-  themeVariables[name] = variables.dark[name];
-});
 
 // Удаляем дубликаты (оставляем последнее значение)
 const uniqueVariables = {};
@@ -112,7 +80,7 @@ Object.keys(themeVariables).forEach(name => {
 
 console.log(`✅ Собрано ${Object.keys(uniqueVariables).length} уникальных переменных`);
 
-// Шаг 7: Создаем финальный контент
+// Шаг 6: Создаем финальный контент
 let themeContent = '';
 
 // Добавляем оригинальные секции :root
@@ -120,45 +88,39 @@ originalSections.forEach(section => {
   themeContent += section + '\n\n';
 });
 
-// Создаем @theme блок с var() ссылками
 // @ts-ignore
-const themeVars = [];
-// @ts-ignore
-const breakpointVars = [];
-
-// Добавляем переменные из light секции как var()
-Object.keys(variables.light).forEach(name => {
-  let key = name;
-  if (name.startsWith('--color-')) {
-    const prefix = name.split('-')[2];
-    const suffix = name.split('-').slice(2).join('-');
-    key = `--${prefix}-${suffix}`;
-  }
-  themeVars.push(`  ${key}: var(${name});`);
-});
-
-// Добавляем breakpoint переменные
-Object.keys(variables.globals).forEach(name => {
-  if (name.startsWith('--breakpoint')) {
-    const prefix = name.split('-')[2];
-    const suffix = name.split('-').slice(2).join('-');
+function generateThemeEntry(name, value) {
+  const match = name.match(/^--(\w+)-(.+)$/);
+  if (match) {
+    const prefix = match[1];
+    const suffix = match[2];
     const key = `--${prefix}-${suffix}`;
-    // @ts-ignore
-    breakpointVars.push(`  ${key}: ${variables.globals[name]};`);
+    const val = ignorePrefixes.includes(prefix) ? value : `var(${name})`;
+    return `  ${key}: ${val};`;
+  }
+  return null;
+}
+
+// @ts-ignore
+const themeEntries = [];
+Object.keys(uniqueVariables).forEach(name => {
+  // @ts-ignore
+  const entry = generateThemeEntry(name, uniqueVariables[name]);
+  if (entry) {
+    themeEntries.push(entry);
   }
 });
 
-// Собираем @theme блок
-if (themeVars.length > 0 || breakpointVars.length > 0) {
+if (themeEntries.length > 0) {
   themeContent += '@theme {\n';
   // @ts-ignore
-  themeContent += themeVars.concat(breakpointVars).join('\n');
+  themeContent += themeEntries.join('\n');
   themeContent += '\n}\n';
 }
 
 console.log('✅ Сформирован контент для @theme блоков');
 
-// Шаг 8: Создаем папку build и файл tailwind-variables.css
+// Шаг 7: Создаем папку build и файл tailwind-variables.css
 if (!fs.existsSync(buildDir)) {
   fs.mkdirSync(buildDir, { recursive: true });
   console.log('✅ Создана папка variables/build/');
