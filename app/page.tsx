@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import RegistrationForm from './components/RegistrationForm'
 
 const Home = () => {
   const [theme, setTheme] = useState('light')
@@ -22,7 +21,6 @@ const Home = () => {
       >
         Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
       </button>
-      {/* <RegistrationForm /> */}
       <h1 className="xl:bg-primary">Hello world!</h1>
       <h1 className="font-primary">Font-Family</h1>
       <div className="bg-primary">with css fefe</div>
