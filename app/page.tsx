@@ -24,6 +24,7 @@ const Home = () => {
       </button>
       {/* <RegistrationForm /> */}
       <h1 className="xl:bg-primary">Hello world!</h1>
+      <h1 className="font-primary">Font-Family</h1>
       <div className="bg-primary">with css fefe</div>
     </>
   )

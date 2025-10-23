@@ -6,6 +6,7 @@ const variablesDir = path.join(__dirname, 'variables');
 const variablesFile = path.join(variablesDir, 'variables.css');
 const buildDir = path.join(variablesDir, 'build');
 const outputFile = path.join(buildDir, 'tailwind-variables.css');
+const outputFileFigmaCode = path.join(buildDir, 'tailwind-variables-figma-code.css');
 
 console.log('🚀 Начинаем обработку variables.css...');
 
@@ -102,6 +103,19 @@ function generateThemeEntry(name, value) {
 }
 
 // @ts-ignore
+function generateThemeEntryFigma(name, value) {
+  const match = name.match(/^--(\w+)-(.+)$/);
+  if (match) {
+    const prefix = match[1];
+    const suffix = match[2];
+    const key = `--${prefix}-${prefix}-${suffix}`;
+    const val = ignorePrefixes.includes(prefix) ? value : `var(${name})`;
+    return `  ${key}: ${val};`;
+  }
+  return null;
+}
+
+// @ts-ignore
 const themeEntries = [];
 Object.keys(uniqueVariables).forEach(name => {
   // @ts-ignore
@@ -120,6 +134,31 @@ if (themeEntries.length > 0) {
 
 console.log('✅ Сформирован контент для @theme блоков');
 
+// Генерация для Figma Code
+// @ts-ignore
+const themeEntriesFigma = [];
+Object.keys(uniqueVariables).forEach(name => {
+  // @ts-ignore
+  const entry = generateThemeEntryFigma(name, uniqueVariables[name]);
+  if (entry) {
+    themeEntriesFigma.push(entry);
+  }
+});
+
+let themeContentFigma = '';
+
+// Добавляем оригинальные секции :root
+originalSections.forEach(section => {
+  themeContentFigma += section + '\n\n';
+});
+
+if (themeEntriesFigma.length > 0) {
+  themeContentFigma += '@theme {\n';
+  // @ts-ignore
+  themeContentFigma += themeEntriesFigma.join('\n');
+  themeContentFigma += '\n}\n';
+}
+
 // Шаг 7: Создаем папку build и файл tailwind-variables.css
 if (!fs.existsSync(buildDir)) {
   fs.mkdirSync(buildDir, { recursive: true });
@@ -128,6 +167,8 @@ if (!fs.existsSync(buildDir)) {
 
 fs.writeFileSync(outputFile, themeContent, 'utf8');
 console.log('✅ Создан файл variables/build/tailwind-variables.css');
+fs.writeFileSync(outputFileFigmaCode, themeContentFigma, 'utf8');
+console.log('✅ Создан файл variables/build/tailwind-variables-figma-code.css');
 
 console.log('\n🎉 Обработка завершена успешно!');
 console.log(`📊 Результат: ${Object.keys(uniqueVariables).length} переменных обработано`);

@@ -4,6 +4,7 @@
   /* color */
   --color-primary: #1b5a96;
   --text-primary: 1rem;
+  --font-primary: 'Roboto';
 }
 /* dark */
 :root {
@@ -11,6 +12,7 @@
   /* color */
   --color-primary: #0d9806;
   --text-primary: 1.25rem;
+  --font-primary: 'Georgia';
 }
 /* breakpoint */
 :root {
